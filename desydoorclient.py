@@ -55,9 +55,18 @@ class DesyDoorClient(object):
         # Add a required token header
         headers_dict = {"x-door-token": self.__door_rest_token}
         r = get(self.__door_rest_root + "/roles/userid/" + user_id, headers=headers_dict)
-        print(r.json())
+        if r.status_code == 200:
+            try:
+                roles = r.json()['roles']
+                return roles
+            except KeyError:
+                logging.warning('No roles assigned to userid: %s', user_id)
+                return False
+        else:
+            logging.warning('Roles could not be checked for userid: %s', user_id)
+        return False
 
 
 client = DesyDoorClient()
 # client.login("testuser", "testpass")
-client.get_user_roles("315")
+roles = client.get_user_roles("315")
