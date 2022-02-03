@@ -59,5 +59,5 @@ class DesyDoorClient(object):
 
 
 client = DesyDoorClient()
-client.login("testuser", "testpass")
+# client.login("testuser", "testpass")
 client.get_user_roles("315")
