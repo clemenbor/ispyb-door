@@ -19,21 +19,22 @@ class DesyDoorClient(object):
         load_dotenv()
         self.__door_rest_root = os.environ["DOOR_REST_ROOT"] or None
         self.__door_rest_token = os.environ["DOOR_REST_TOKEN"] or None
+        # Set required door token header for any HTTP call
+        self.__door_header_token = {"x-door-token": self.__door_rest_token}
 
     def login(self, username, password, retry=True, fields=None):
         # First encode the password in base64
         message_bytes = password.encode('ascii')
         base64_bytes = base64.b64encode(message_bytes)
         base64_password = base64_bytes.decode('ascii')
-        # Add a required token header
-        headers_dict = {"x-door-token": self.__door_rest_token}
         # Make an HTTP post request with username and encoded password
         r = post(self.__door_rest_root + "/doorauth/auth",
-                 data={'user': username, 'pass': base64_password}, headers=headers_dict)
+                 data={'user': username, 'pass': base64_password}, headers=self.__door_header_token)
         if r.status_code == 200:
+            print(r.text)
             # status 200 means user authenticated
             logging.info('Username has been succesfully authenticated: %s', username)
-            return True, username
+            return True, r.json()['userdata']['userid']
         elif r.status_code == 401:
             # status 401 means unauthorized for different reasons: wrong password, wrong token,
             # server not allowed to connect to
@@ -52,9 +53,7 @@ class DesyDoorClient(object):
         return False
 
     def get_user_roles(self, user_id):
-        # Add a required token header
-        headers_dict = {"x-door-token": self.__door_rest_token}
-        r = get(self.__door_rest_root + "/roles/userid/" + user_id, headers=headers_dict)
+        r = get(self.__door_rest_root + "/roles/userid/" + str(user_id), headers=self.__door_header_token)
         if r.status_code == 200:
             try:
                 roles = r.json()['roles']
@@ -68,5 +67,5 @@ class DesyDoorClient(object):
 
 
 client = DesyDoorClient()
-# client.login("testuser", "testpass")
-roles = client.get_user_roles("315")
+auth = client.login("username", "password")
+roles = client.get_user_roles(auth[1])
