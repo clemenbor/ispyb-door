@@ -31,7 +31,6 @@ class DesyDoorClient(object):
         r = post(self.__door_rest_root + "/doorauth/auth",
                  data={'user': username, 'pass': base64_password}, headers=self.__door_header_token)
         if r.status_code == 200:
-            print(r.text)
             # status 200 means user authenticated
             logging.info('Username has been succesfully authenticated: %s', username)
             return True, r.json()['userdata']['userid']
@@ -65,7 +64,12 @@ class DesyDoorClient(object):
             logging.warning('Roles could not be checked for userid: %s', user_id)
         return False
 
+    def get_institute(self, institute_id):
+        r = get(self.__door_rest_root + "/institutes/id/" + institute_id, headers=self.__door_header_token)
+        if r.status_code == 200:
+            return r.json()['institute metadata']
 
-client = DesyDoorClient()
-auth = client.login("username", "password")
-roles = client.get_user_roles(auth[1])
+    def get_institute_list(self):
+        r = get(self.__door_rest_root + "/institutes/list/", headers=self.__door_header_token)
+        if r.status_code == 200:
+            return r.json()['institute metadata']

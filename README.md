@@ -10,8 +10,4 @@ DOOR_REST_ROOT=https://example.desy.de/api/v1.0
 DOOR_REST_TOKEN=44b125547d126a6cc6343aa256754334d0007788c0c51ec3d8a40c297024b7
 ```
 
-To play with the script just adapt accordingly a username/password and then execute:
-
-```
-python desydoorclient.py
-```
+To play with the client check the examples folder.
