@@ -1,6 +1,6 @@
-from desydoorauth import DesyDoorAuth
 import sys
 sys.path.insert(0, '..')
+from desydoorauth import DesyDoorAuth
 
 
 client = DesyDoorAuth()
