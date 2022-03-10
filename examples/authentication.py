@@ -1,6 +1,8 @@
-from desydoorclient import DesyDoorClient
+from desydoorauth import DesyDoorAuth
+import sys
+sys.path.insert(0, '..')
 
-client = DesyDoorClient()
+client = DesyDoorAuth()
 
 auth = client.login("username", "password")
 # If user is authenticated

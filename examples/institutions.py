@@ -1,6 +1,9 @@
-from desydoorclient import DesyDoorClient
+from desydoorauth import DesyDoorAuth
+import sys
+sys.path.insert(0, '..')
 
-client = DesyDoorClient()
+
+client = DesyDoorAuth()
 
 institute_json = client.get_institute("1")
 print(institute_json)

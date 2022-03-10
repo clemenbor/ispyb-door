@@ -1,26 +1,25 @@
 import json
 import base64
-import os
 import logging
 import logging.handlers
 from requests import post, get
-from dotenv import load_dotenv
-
-logging.basicConfig(filename='desydoorclient.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+from desydoorapi import DesyDoorAPI, requests_exceptions
 
 
-class DesyDoorClient(object):
+class DesyDoorAuth(DesyDoorAPI):
     """
     RESTful Web-service authentication client for DESY Door user portal.
     """
 
-    def __init__(self):
-        load_dotenv()
-        self.__door_rest_root = os.environ["DOOR_REST_ROOT"] or None
-        self.__door_rest_token = os.environ["DOOR_REST_TOKEN"] or None
-        # Set required door token header for any HTTP call
-        self.__door_header_token = {"x-door-token": self.__door_rest_token}
+    def get_door_request(self, url):
+        r = get(url, headers=self.get_door_header_token())
+        r.raise_for_status()
+        return r
+
+    def post_door_request(self, url):
+        r = post(url, headers=self.get_door_header_token())
+        r.raise_for_status()
+        return r
 
     def login(self, username, password, retry=True, fields=None):
         # First encode the password in base64
@@ -28,8 +27,8 @@ class DesyDoorClient(object):
         base64_bytes = base64.b64encode(message_bytes)
         base64_password = base64_bytes.decode('ascii')
         # Make an HTTP post request with username and encoded password
-        r = post(self.__door_rest_root + "/doorauth/auth",
-                 data={'user': username, 'pass': base64_password}, headers=self.__door_header_token)
+        r = post(self.get_door_rest_root() + "/doorauth/auth",
+                 data={'user': username, 'pass': base64_password}, headers=self.get_door_header_token())
         if r.status_code == 200:
             # status 200 means user authenticated
             logging.info('Username has been succesfully authenticated: %s', username)
@@ -51,8 +50,9 @@ class DesyDoorClient(object):
             logging.error('%s - %s', r.text, r.url)
         return False
 
+    @requests_exceptions
     def get_user_roles(self, user_id):
-        r = get(self.__door_rest_root + "/roles/userid/" + str(user_id), headers=self.__door_header_token)
+        r = get(self.get_door_rest_root() + "/roles/userid/" + str(user_id), headers=self.get_door_header_token())
         if r.status_code == 200:
             try:
                 roles = r.json()['roles']
@@ -64,12 +64,14 @@ class DesyDoorClient(object):
             logging.warning('Roles could not be checked for userid: %s', user_id)
         return False
 
+    @requests_exceptions
     def get_institute(self, institute_id):
-        r = get(self.__door_rest_root + "/institutes/id/" + institute_id, headers=self.__door_header_token)
+        r = get(self.get_door_rest_root() + "/institutes/id/" + institute_id, headers=self.get_door_header_token())
         if r.status_code == 200:
             return r.json()['institute metadata']
 
+    @requests_exceptions
     def get_institute_list(self):
-        r = get(self.__door_rest_root + "/institutes/list/", headers=self.__door_header_token)
+        r = get(self.get_door_rest_root() + "/institutes/list/", headers=self.get_door_header_token())
         if r.status_code == 200:
             return r.json()['institute metadata']
