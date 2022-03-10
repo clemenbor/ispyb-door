@@ -60,7 +60,6 @@ class DesyDoorAPI(object):
         r.raise_for_status()
         return r
 
-    @requests_exceptions
     def get_proposals(self, beamline):
         r = self.get_door_request(self.__door_rest_root + "/proposals/beamline/" + beamline)
         if r.status_code == 200:
@@ -68,9 +67,9 @@ class DesyDoorAPI(object):
                 return r.json()['proposals']
             except KeyError:
                 logging.warning(r.json()['message'])
+        print("que paso!!")
         return None
 
-    @requests_exceptions
     def get_proposal(self, proposal_id):
         r = self.get_door_request(self.__door_rest_root + "/proposals/propid/" + proposal_id)
         if r.status_code == 200:
@@ -80,18 +79,15 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
-    @requests_exceptions
     def get_proposal_sessions(self, proposal_id):
         r = self.get_door_request(self.__door_rest_root + "/experiments/propid/" + proposal_id)
         if r.status_code == 200:
             try:
-                print(r.json()['experiment metadata'])
                 return r.json()['experiment metadata']
             except KeyError:
                 logging.warning(r.json()['message'])
         return None
 
-    @requests_exceptions
     def get_sessions(self, beamline):
         r = self.get_door_request(self.__door_rest_root + "/experiments/beamline/" + beamline)
         if r.status_code == 200:
@@ -101,7 +97,6 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
-    @requests_exceptions
     def get_session(self, session_id):
         r = self.get_door_request(self.__door_rest_root + "/experiments/expid/" + session_id)
         if r.status_code == 200:

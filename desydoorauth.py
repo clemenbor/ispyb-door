@@ -50,7 +50,6 @@ class DesyDoorAuth(DesyDoorAPI):
             logging.error('%s - %s', r.text, r.url)
         return False
 
-    @requests_exceptions
     def get_user_roles(self, user_id):
         r = get(self.get_door_rest_root() + "/roles/userid/" + str(user_id), headers=self.get_door_header_token())
         if r.status_code == 200:
@@ -64,13 +63,11 @@ class DesyDoorAuth(DesyDoorAPI):
             logging.warning('Roles could not be checked for userid: %s', user_id)
         return False
 
-    @requests_exceptions
     def get_institute(self, institute_id):
         r = get(self.get_door_rest_root() + "/institutes/id/" + institute_id, headers=self.get_door_header_token())
         if r.status_code == 200:
             return r.json()['institute metadata']
 
-    @requests_exceptions
     def get_institute_list(self):
         r = get(self.get_door_rest_root() + "/institutes/list/", headers=self.get_door_header_token())
         if r.status_code == 200:
