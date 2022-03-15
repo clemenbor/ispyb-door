@@ -1,3 +1,4 @@
+import setuptools
 from setuptools import setup
 
 setup(
@@ -17,6 +18,9 @@ setup(
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     install_requires=['requests'],
+    package_dir={"": "src"},
+    packages=setuptools.find_packages(where="src"),
 )
