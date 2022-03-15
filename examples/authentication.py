@@ -4,7 +4,7 @@ from desydoorauth import DesyDoorAuth
 
 client = DesyDoorAuth()
 
-auth = client.login("borgescl", "H6xuhx6k")
+auth = client.login("username", "password")
 # If user is authenticated
 print(auth)
 if auth:
