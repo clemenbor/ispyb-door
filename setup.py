@@ -1,5 +1,4 @@
-import setuptools
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='ispyb-door',
@@ -21,6 +20,5 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     install_requires=['requests'],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    packages=find_packages(exclude=["examples"]),  # Don't include examples directory
 )
