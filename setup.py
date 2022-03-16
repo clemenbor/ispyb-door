@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='ispyb-door',
+    name='pydesydoor',
     version='1.0.0',
-    description='A python API to DESY DOOR portal',
-    url='https://github.com/clemenbor/ispyb-door',
+    description='A python API to DESY DOOR user portal',
+    url='https://github.com/clemenbor/pydesydoor',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

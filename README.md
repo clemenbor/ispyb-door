@@ -1,5 +1,5 @@
-# ispyb-door
-A python API to DOOR
+# pydesydoor
+A python API to DESY DOOR user portal
 
 The project takes environment variables from a .env file. The variables are loaded into the scripts by using https://pypi.org/project/python-dotenv/
 
