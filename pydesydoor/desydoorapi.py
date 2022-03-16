@@ -60,8 +60,8 @@ class DesyDoorAPI(object):
         r.raise_for_status()
         return r
 
-    def get_proposals(self, beamline):
-        r = self.get_door_request("/proposals/beamline/" + beamline)
+    def get_beamline_proposals(self, beamline):
+        r = self.get_door_request("/proposals/beamline/{}".format(beamline))
         if r.status_code == 200:
             try:
                 return r.json()['proposals']
@@ -70,7 +70,7 @@ class DesyDoorAPI(object):
         return None
 
     def get_proposal(self, proposal_id):
-        r = self.get_door_request("/proposals/propid/" + proposal_id)
+        r = self.get_door_request("/proposals/propid/{}".format(proposal_id))
         if r.status_code == 200:
             try:
                 return r.json()['proposals'][proposal_id]
@@ -79,7 +79,7 @@ class DesyDoorAPI(object):
         return None
 
     def get_proposal_sessions(self, proposal_id):
-        r = self.get_door_request("/experiments/propid/" + proposal_id)
+        r = self.get_door_request("/experiments/propid/{}".format(proposal_id))
         if r.status_code == 200:
             try:
                 return r.json()['experiment metadata']
@@ -88,7 +88,7 @@ class DesyDoorAPI(object):
         return None
 
     def get_sessions(self, beamline):
-        r = self.get_door_request("/experiments/beamline/" + beamline)
+        r = self.get_door_request("/experiments/beamline/{}".format(beamline))
         if r.status_code == 200:
             try:
                 return r.json()['experiment metadata']
@@ -97,7 +97,7 @@ class DesyDoorAPI(object):
         return None
 
     def get_session(self, session_id):
-        r = self.get_door_request("/experiments/expid/" + session_id)
+        r = self.get_door_request("/experiments/expid/{}".format(session_id))
         if r.status_code == 200:
             try:
                 return r.json()['experiment metadata'][session_id]
@@ -105,8 +105,17 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
+    def get_user(self, user_id):
+        r = self.get_door_request("/users/id/{}".format(user_id))
+        if r.status_code == 200:
+            try:
+                return r.json()['user metadata'][str(user_id)]
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
+
     def get_user_roles(self, user_id):
-        r = self.get_door_request("/roles/userid/" + str(user_id))
+        r = self.get_door_request("/roles/userid/{}".format(user_id))
         if r.status_code == 200:
             try:
                 roles = r.json()['roles']
@@ -119,11 +128,10 @@ class DesyDoorAPI(object):
         return False
 
     def get_institute(self, institute_id):
-        r = self.get_door_request("/institutes/id/" + institute_id)
+        r = self.get_door_request("/institutes/id/{}".format(institute_id))
         if r.status_code == 200:
-            return r.json()['institute metadata']
-
-    def get_institute_list(self):
-        r = self.get_door_request("/institutes/list/")
-        if r.status_code == 200:
-            return r.json()['institute metadata']
+            try:
+                return r.json()['institute metadata'][str(institute_id)]
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
