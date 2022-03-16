@@ -5,6 +5,8 @@ setup(
     version='1.0.0',
     description='A python API to DESY DOOR user portal',
     url='https://github.com/clemenbor/pydesydoor',
+    author='Clemente Borges',
+    author_email='clemente.borges@desy.de',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -19,6 +21,6 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    install_requires=['requests'],
+    install_requires=['requests', 'python-dotenv'],
     packages=find_packages(exclude=["examples"]),  # Don't include examples directory
 )
