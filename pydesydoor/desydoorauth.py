@@ -3,7 +3,7 @@ import base64
 import logging
 import logging.handlers
 from requests import post, get
-from desydoorapi import DesyDoorAPI
+from pydesydoor.desydoorapi import DesyDoorAPI
 
 
 class DesyDoorAuth(DesyDoorAPI):
