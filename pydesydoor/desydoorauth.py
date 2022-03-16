@@ -3,12 +3,12 @@ import base64
 import logging
 import logging.handlers
 from requests import post, get
-from desydoorapi import DesyDoorAPI, requests_exceptions
+from desydoorapi import DesyDoorAPI
 
 
 class DesyDoorAuth(DesyDoorAPI):
     """
-    RESTful Web-service authentication client for DESY Door user portal.
+    RESTful Web-service user authentication client for DESY Door user portal.
     """
 
     def get_door_request(self, url):
@@ -49,26 +49,3 @@ class DesyDoorAuth(DesyDoorAPI):
             # status 400 means no valid api call
             logging.error('%s - %s', r.text, r.url)
         return False
-
-    def get_user_roles(self, user_id):
-        r = get(self.get_door_rest_root() + "/roles/userid/" + str(user_id), headers=self.get_door_header_token())
-        if r.status_code == 200:
-            try:
-                roles = r.json()['roles']
-                return roles
-            except KeyError:
-                logging.warning('No roles assigned to userid: %s', user_id)
-                return False
-        else:
-            logging.warning('Roles could not be checked for userid: %s', user_id)
-        return False
-
-    def get_institute(self, institute_id):
-        r = get(self.get_door_rest_root() + "/institutes/id/" + institute_id, headers=self.get_door_header_token())
-        if r.status_code == 200:
-            return r.json()['institute metadata']
-
-    def get_institute_list(self):
-        r = get(self.get_door_rest_root() + "/institutes/list/", headers=self.get_door_header_token())
-        if r.status_code == 200:
-            return r.json()['institute metadata']
