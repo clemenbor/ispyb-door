@@ -87,7 +87,7 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
-    def get_sessions(self, beamline):
+    def get_beamline_sessions(self, beamline):
         r = self.get_door_request("/experiments/beamline/{}".format(beamline))
         if r.status_code == 200:
             try:
