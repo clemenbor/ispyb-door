@@ -8,7 +8,8 @@ class DoorISPyB(DesyDoorAPI):
     RESTful Web-service API client to generate the data format required to import
     data into ISPyB.
     """
-    def get_full_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True, with_sessions=True):
+    def get_full_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True, with_sessions=True,
+                                   with_session_participants=True):
         """
            Get the full proposal data (sessions, etc) from DOOR in format for py-ispyb
 
@@ -16,13 +17,15 @@ class DoorISPyB(DesyDoorAPI):
            :param boolean with_leader: True/False depending if the proposal leader data is needed
            :param boolean with_cowriters: True/False depending if the proposal cowriters data is needed
            :param boolean with_sessions: True/False depending if the proposal sessions data is needed
+           :param boolean with_session_participants: True/False depending if the session participants data is needed
         """
         ispyb_proposal = {}
         # Getting the proposal data without leader and cowriters
         proposal_data = self.get_proposal_to_ispyb(door_proposal_id, with_leader, with_cowriters)
         ispyb_proposal["proposal"] = proposal_data
-        sessions_data = self.get_sessions_to_ispyb(door_proposal_id, with_sessions)
-        ispyb_proposal["sessions"] = sessions_data
+        if with_sessions:
+            sessions_data = self.get_sessions_to_ispyb(door_proposal_id, with_session_participants)
+            ispyb_proposal["sessions"] = sessions_data
         return json.dumps(ispyb_proposal, indent=4, sort_keys=True, default=str)
 
     def get_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True):
