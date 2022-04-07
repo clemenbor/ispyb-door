@@ -49,9 +49,16 @@ class DoorISPyB(DesyDoorAPI):
         if with_cowriters:
             # Set the co-writers
             if door_proposal["proposalCowriters"]:
-                cowriter_ids = self.split_multiple_by_comma(door_proposal["proposalCowriters"])
-                for cowriter_id in cowriter_ids:
-                    cowriter = self.get_user_to_ispyb(cowriter_id)
+                if not isinstance(door_proposal["proposalCowriters"], int):
+                    # There is more than one co-writer
+                    cowriter_ids = self.split_multiple_by_comma(door_proposal["proposalCowriters"])
+                    for cowriter_id in cowriter_ids:
+                        cowriter = self.get_user_to_ispyb(cowriter_id)
+                        cowriter["type"] = "cowriter"
+                        participants.append(cowriter)
+                else:
+                    # There is only one co-writer
+                    cowriter = self.get_user_to_ispyb(door_proposal["proposalCowriters"])
                     cowriter["type"] = "cowriter"
                     participants.append(cowriter)
         # Add participants
