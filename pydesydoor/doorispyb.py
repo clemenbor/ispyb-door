@@ -9,18 +9,25 @@ class DoorISPyB(DesyDoorAPI):
     data into ISPyB.
     """
     def get_full_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True, with_sessions=True):
+        """
+           Get the full proposal data (sessions, etc) from DOOR in format for py-ispyb
+
+           :param str door_proposal_id: The DOOR proposal id
+           :param boolean with_leader: True/False depending if the proposal leader data is needed
+           :param boolean with_cowriters: True/False depending if the proposal cowriters data is needed
+           :param boolean with_sessions: True/False depending if the proposal sessions data is needed
+        """
         ispyb_proposal = {}
         # Getting the proposal data without leader and cowriters
         proposal_data = self.get_proposal_to_ispyb(door_proposal_id, with_leader, with_cowriters)
         ispyb_proposal["proposal"] = proposal_data
-        if with_sessions:
-            sessions_data = self.get_sessions_to_ispyb(door_proposal_id)
-            ispyb_proposal["sessions"] = sessions_data
+        sessions_data = self.get_sessions_to_ispyb(door_proposal_id, with_sessions)
+        ispyb_proposal["sessions"] = sessions_data
         return json.dumps(ispyb_proposal, indent=4, sort_keys=True, default=str)
 
     def get_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True):
         """
-           Send a message to a recipient
+           Get the proposal data from DOOR in format for py-ispyb
 
            :param str door_proposal_id: The DOOR proposal id
            :param boolean with_leader: True/False depending if the leader data is needed
@@ -67,6 +74,12 @@ class DoorISPyB(DesyDoorAPI):
         return data
 
     def get_user_to_ispyb(self, door_user_id, with_laboratory=True):
+        """
+           Get the user data from DOOR in format for py-ispyb
+
+           :param str door_user_id: The DOOR user id
+           :param boolean with_laboratory: True/False depending if the Laboratory/Institute data is needed
+        """
         user = {}
         door_user = self.get_user(door_user_id)
         user["givenName"] = door_user["givenName"]
@@ -86,6 +99,12 @@ class DoorISPyB(DesyDoorAPI):
         return door_laboratory
 
     def get_sessions_to_ispyb(self, door_proposal_id, with_participants=True):
+        """
+           Get the proposal sessions data from DOOR in format for py-ispyb
+
+           :param str door_proposal_id: The DOOR proposal id
+           :param boolean with_participants: True/False depending if the session participants data is needed
+        """
         sessions = self.get_proposal_sessions(door_proposal_id)
         if sessions:
             for session in sessions:
@@ -113,6 +132,9 @@ class DoorISPyB(DesyDoorAPI):
         return None
 
     def get_participants(self, participants, participant_type):
+        """
+           Helper function to setup the session participants data
+        """
         users = []
         array_participants = None
         if participants[participant_type]:
