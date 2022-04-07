@@ -8,10 +8,10 @@ class DoorISPyB(DesyDoorAPI):
     RESTful Web-service API client to generate the data format required to import
     data into ISPyB.
     """
-    def get_full_proposal_to_ispyb(self, door_proposal_id, with_sessions=True):
+    def get_full_proposal_to_ispyb(self, door_proposal_id, with_leader=True, with_cowriters=True, with_sessions=True):
         ispyb_proposal = {}
         # Getting the proposal data without leader and cowriters
-        proposal_data = self.get_proposal_to_ispyb(door_proposal_id, False, False)
+        proposal_data = self.get_proposal_to_ispyb(door_proposal_id, with_leader, with_cowriters)
         ispyb_proposal["proposal"] = proposal_data
         if with_sessions:
             sessions_data = self.get_sessions_to_ispyb(door_proposal_id)
@@ -124,8 +124,3 @@ class DoorISPyB(DesyDoorAPI):
                     participant["type"] = participant_type
                     users.append(participant)
             return users
-
-    @staticmethod
-    def split_multiple_by_comma(multiple_values):
-        data = [x.strip() for x in multiple_values.split(',')]
-        return data

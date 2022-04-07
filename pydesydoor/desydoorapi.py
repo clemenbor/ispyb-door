@@ -135,3 +135,7 @@ class DesyDoorAPI(object):
             except KeyError:
                 logging.warning(r.json()['message'])
         return None
+
+    def split_multiple_by_comma(multiple_values):
+        data = [x.strip() for x in multiple_values.split(',')]
+        return data
