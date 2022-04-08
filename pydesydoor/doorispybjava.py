@@ -2,6 +2,7 @@ import json
 from pydesydoor.desydoorapi import DesyDoorAPI
 from datetime import datetime
 
+
 class DoorISPyBJava(DesyDoorAPI):
 
     def get_ispyb_user(self, door_user_id, user_type, door_proposal):
@@ -92,10 +93,11 @@ class DoorISPyBJava(DesyDoorAPI):
         sessions = []
         door_proposal = self.get_proposal(door_proposal_id)
         door_sessions = self.get_proposal_sessions(door_proposal_id)
-        for session in door_sessions:
-            ispyb_session = self.get_ispyb_session(door_sessions[session], door_proposal)
-            if ispyb_session:
-                sessions.append(ispyb_session)
+        if door_sessions:
+            for session in door_sessions:
+                ispyb_session = self.get_ispyb_session(door_sessions[session], door_proposal)
+                if ispyb_session:
+                    sessions.append(ispyb_session)
         return json.dumps(sessions, indent=4, sort_keys=True, default=str)
 
     def get_ispyb_session(self, door_session, door_proposal):
