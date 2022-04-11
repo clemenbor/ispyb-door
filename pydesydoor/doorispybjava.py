@@ -135,8 +135,9 @@ class DoorISPyBJava(DesyDoorAPI):
         if door_proposal["proposalPI"]:
             session["mainProposer"] = self.get_session_user(door_proposal["proposalPI"])
 
-        # Pending to see where to get the local contact
-        session["firstLocalContact"] = self.get_session_user(1)
+        # Get the local contact
+        if door_session["beamlineOperator"]:
+            session["firstLocalContact"] = self.get_session_user(door_session["beamlineOperator"])
         return session
 
     @staticmethod
