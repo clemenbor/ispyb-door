@@ -69,6 +69,25 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
+    def get_beamline_proposals_by_year(self, beamline, year):
+        r = self.get_door_request("/proposals/beamline/{}/year/{}".format(beamline, year))
+        if r.status_code == 200:
+            try:
+                return r.json()['proposals']
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
+
+    def get_beamline_proposals_by_date_range(self, beamline, start_date, end_date):
+        # date format YYYYMMDD
+        r = self.get_door_request("/proposals/beamline/{}/date/{}/{}".format(beamline, start_date, end_date))
+        if r.status_code == 200:
+            try:
+                return r.json()['proposals']
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
+
     def get_proposal(self, proposal_id):
         r = self.get_door_request("/proposals/propid/{}".format(proposal_id))
         if r.status_code == 200:
