@@ -1,11 +1,13 @@
 import os
 import logging
 import logging.handlers
+
+import requests.packages.urllib3
 from requests import post, get, exceptions
 from functools import wraps
 from dotenv import load_dotenv
 
-
+requests.packages.urllib3.disable_warnings()
 logging.basicConfig(filename='desydoorapi.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 
@@ -51,12 +53,12 @@ class DesyDoorAPI(object):
         return self.__door_header_token
 
     def get_door_request(self, url):
-        r = get(self.__door_rest_root + url, headers=self.__door_service_headers)
+        r = get(self.__door_rest_root + url, headers=self.__door_service_headers, verify=False)
         r.raise_for_status()
         return r
 
     def post_door_request(self, url):
-        r = post(self.__door_rest_root + url, headers=self.__door_service_headers)
+        r = post(self.__door_rest_root + url, headers=self.__door_service_headers, verify=False)
         r.raise_for_status()
         return r
 
@@ -108,6 +110,25 @@ class DesyDoorAPI(object):
 
     def get_beamline_sessions(self, beamline):
         r = self.get_door_request("/experiments/beamline/{}".format(beamline))
+        if r.status_code == 200:
+            try:
+                return r.json()['experiment metadata']
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
+
+    def get_beamline_sessions_by_year(self, beamline, year):
+        r = self.get_door_request("/experiments/beamline/{}/year/{}".format(beamline, year))
+        if r.status_code == 200:
+            try:
+                return r.json()['experiment metadata']
+            except KeyError:
+                logging.warning(r.json()['message'])
+        return None
+
+    def get_beamline_sessions_by_date_range(self, beamline, start_date, end_date):
+        # date format YYYYMMDD
+        r = self.get_door_request("/experiments/beamline/{}/date/{}/{}".format(beamline, start_date, end_date))
         if r.status_code == 200:
             try:
                 return r.json()['experiment metadata']
