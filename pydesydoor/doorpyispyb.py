@@ -42,6 +42,7 @@ class DoorPyISPyB(DesyDoorAPI):
         data["proposalNumber"] = str(door_proposal["proposalNumber"])
         data["proposalCode"] = door_proposal["proposalCode"]
         data["proposalType"] = "MX"
+        data["externalId"] = int(door_proposal["proposalNumber"])
         data["bltimeStamp"] = None
         data["state"] = "Open"
         persons = []
