@@ -11,6 +11,9 @@ class TestDesyDoorAPI(TestCase):
         # User with id 1 has super user role
         self.user_id = 1
         self.institute_id = 1
+        self.beamline = "p11"
+        self.start_date = "2021"
+        self.end_date = "2022"
 
     def test_get_proposal(self):
         door_proposal = self.client.get_proposal(self.proposal_id)
@@ -40,3 +43,7 @@ class TestDesyDoorAPI(TestCase):
     def test_get_institute(self):
         institute = self.client.get_institute(self.institute_id)
         self.assertTrue(institute["laboratoryExtPk"], self.institute_id)
+
+    # Pending to test properly
+    def test_get_beamline_sessions_by_date_range(self):
+        self.get_beamline_sessions_by_date_range(self.beamline, self.start_date, self.end_date)

@@ -90,7 +90,7 @@ class DoorPyISPyB(DesyDoorAPI):
         if with_laboratory:
             user["laboratory"] = self.get_laboratory_to_pyispyb(door_user["laboratoryId"])
         user["phoneNumber"] = str(door_user["phoneNumber"])
-        user["siteId"] = int(door_user_id)
+        user["externalId"] = int(door_user_id)
         return user
 
     def get_laboratory_to_pyispyb(self, laboratory_id):
@@ -109,7 +109,7 @@ class DoorPyISPyB(DesyDoorAPI):
         if door_sessions:
             add_session = dict()
             for session in door_sessions:
-                add_session["expSessionPk"] = int(session)
+                add_session["externalId"] = int(session)
                 datetime_start = datetime.strptime(door_sessions[session]["startDate"], '%Y-%m-%d %H:%M:%S')
                 add_session["startDate"] = datetime_start.isoformat()
                 datetime_end = datetime.strptime(door_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S')
