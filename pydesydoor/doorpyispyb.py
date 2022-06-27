@@ -36,6 +36,7 @@ class DoorPyISPyB(DesyDoorAPI):
            :param boolean with_leader: True/False depending if the leader data is needed
            :param boolean with_cowriters: True/False depending if the cowriters data is needed
         """
+        # Add proposal data
         data = {}
         door_proposal = self.get_proposal(door_proposal_id)
         data["title"] = door_proposal["title"]
@@ -72,7 +73,8 @@ class DoorPyISPyB(DesyDoorAPI):
                     persons.append(cowriter)
         # Add proposal persons
         data["persons"] = persons
-        # Add proposal data
+        # Add lab contacts
+        data["labcontacts"] = self.get_labcontacts_to_pyispyb(persons)
         return data
 
     def get_user_to_pyispyb(self, door_user_id, with_laboratory=True):
@@ -159,3 +161,19 @@ class DoorPyISPyB(DesyDoorAPI):
                         participant["session_options"] = session_options
                     users.append(participant)
             return users
+
+    def get_labcontacts_to_pyispyb(self, persons):
+        """
+           The lab contact will be basically the same proposers (Pi, co-writers, etc).
+           If needed, we could add later also the session participants.
+        """
+        lab_contacts = []
+        for person in persons:
+            labcontact = dict()
+            cardname = person["login"] + "-" + person["laboratory"]["name"]
+            if len(cardname) > 45:
+                cardname = cardname[:45]
+            labcontact["cardName"] = cardname
+            labcontact["person"] = person
+            lab_contacts.append(labcontact)
+        return lab_contacts
