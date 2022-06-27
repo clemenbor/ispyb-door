@@ -12,6 +12,11 @@ DOOR_SERVICE_ACCOUNT=xxyyzz
 DOOR_SERVICE_PASSWORD=xxyyzz
 DOOR_TESTUSER_USERNAME=xxyyzz
 DOOR_TESTUSER_PASSWORD=xxyyzz
+# ------------------- PY-ISPYB PARAMETERS ------------------
+PYISPYB_API_ROOT=https://example.pyispyb.desy.de
+PYISPYB_AUTH_PLUGIN=xxyyzz
+PYISPYB_SERVICE_ACCOUNT=xxyyzz
+PYISPYB_SERVICE_PASSWORD=xxyyzz
 ```
 
 
@@ -25,3 +30,10 @@ pip install git+https://github.com/clemenbor/pydesydoor.git#egg=pydesydoor
 
 ## Examples
 To play with the client check the examples folder.
+
+
+## Sync a DOOR proposal with py-ispyb
+There is a command line tool to get a proposal from DOOR and sync it into py-ispyb. Ex:
+```bash
+python syncdoor.py --proposal 20210046
+```
