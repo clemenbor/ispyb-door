@@ -171,7 +171,11 @@ class DesyDoorAPI(object):
         r = self.get_door_request("/institutes/id/{}".format(institute_id))
         if r.status_code == 200:
             try:
-                return r.json()['institute metadata'][str(institute_id)]
+                json_institute = r.json()['institute metadata'][str(institute_id)]
+                # ISPyB only accepts 45 chars as institute name
+                if len(json_institute["name"]) > 45:
+                    json_institute["name"] = json_institute["name"][:45]
+                return json_institute
             except KeyError:
                 logging.warning(r.json()['message'])
         return None
