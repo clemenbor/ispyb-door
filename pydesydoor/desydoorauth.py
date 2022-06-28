@@ -12,12 +12,12 @@ class DesyDoorAuth(DesyDoorAPI):
     """
 
     def get_door_request(self, url):
-        r = get(url, headers=self.get_door_header_token())
+        r = get(url, headers=self.get_door_header_token(), verify=False)
         r.raise_for_status()
         return r
 
     def post_door_request(self, url):
-        r = post(url, headers=self.get_door_header_token())
+        r = post(url, headers=self.get_door_header_token(), verify=False)
         r.raise_for_status()
         return r
 
@@ -28,7 +28,7 @@ class DesyDoorAuth(DesyDoorAPI):
         base64_password = base64_bytes.decode('ascii')
         # Make an HTTP post request with username and encoded password
         r = post(self.get_door_rest_root() + "/doorauth/auth",
-                 data={'user': username, 'pass': base64_password}, headers=self.get_door_header_token())
+                 data={'user': username, 'pass': base64_password}, headers=self.get_door_header_token(), verify=False)
         if r.status_code == 200:
             # status 200 means user authenticated
             logging.info('Username has been succesfully authenticated: %s', username)
