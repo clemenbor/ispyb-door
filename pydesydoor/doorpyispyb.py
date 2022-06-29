@@ -43,7 +43,11 @@ class DoorPyISPyB(DesyDoorAPI):
         data["proposalNumber"] = str(door_proposal["proposalNumber"])
         data["proposalCode"] = door_proposal["proposalCode"]
         data["proposalType"] = "MX"
-        data["externalId"] = int(door_proposal["proposalNumber"])
+        '''
+        ExternalId field is not compatible with the JAVA API, can be used later
+        when full migration to py-ispyb is done and JAVA API is not used anymore.
+        '''
+        # data["externalId"] = int(door_proposal["proposalNumber"])
         data["bltimeStamp"] = None
         data["state"] = "Open"
         persons = []
@@ -93,7 +97,11 @@ class DoorPyISPyB(DesyDoorAPI):
         if with_laboratory:
             user["laboratory"] = self.get_laboratory_to_pyispyb(door_user["laboratoryId"])
         user["phoneNumber"] = str(door_user["phoneNumber"])
-        user["externalId"] = int(door_user_id)
+        '''
+        ExternalId field is not compatible with the JAVA API, can be used later
+        when full migration to py-ispyb is done and JAVA API is not used anymore.
+        '''
+        # user["externalId"] = int(door_user_id)
         return user
 
     def get_laboratory_to_pyispyb(self, laboratory_id):
@@ -112,7 +120,12 @@ class DoorPyISPyB(DesyDoorAPI):
         if door_sessions:
             add_session = dict()
             for session in door_sessions:
-                add_session["externalId"] = int(session)
+                '''
+                ExternalId field is not compatible with the JAVA API, can be used later
+                when full migration to py-ispyb is done and JAVA API is not used anymore.
+                '''
+                #add_session["externalId"] = int(session)
+                add_session["expSessionPk"] = int(session)
                 datetime_start = datetime.strptime(door_sessions[session]["startDate"], '%Y-%m-%d %H:%M:%S')
                 add_session["startDate"] = datetime_start.isoformat()
                 datetime_end = datetime.strptime(door_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S')
