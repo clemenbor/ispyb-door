@@ -13,10 +13,17 @@ parser.add_argument("-p", "--proposal", dest="proposal_id",
 
 def sync_proposal(proposal_id):
     client = DoorPyISPyB()
-    start = time.time()
-    proposal = client.get_full_proposal_to_pyispyb(proposal_id, True, True, True, True)
-    took = round(time.time() - start, 3)
-    print(f"Retrieving proposal {proposal_id} from the DOOR API took {took}")
+
+    try:
+        start = time.time()
+        proposal = client.get_full_proposal_to_pyispyb(proposal_id, True, True, True, True)
+        took = round(time.time() - start, 3)
+        print(f"Retrieving proposal {proposal_id} from the DOOR API took {took}")
+    except Exception as e:
+        print(f"There was an error retrieving proposal {proposal_id} from the DOOR API.")
+        print(f"Probably the proposal Id does not exist within the DOOR API environment.")
+        print(e)
+        sys.exit(1)
 
     # Login to FastAPI and get the token
     login = dict()

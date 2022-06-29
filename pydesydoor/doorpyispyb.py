@@ -130,7 +130,7 @@ class DoorPyISPyB(DesyDoorAPI):
                 add_session["startDate"] = datetime_start.isoformat()
                 datetime_end = datetime.strptime(door_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S')
                 add_session["endDate"] = datetime_end.isoformat()
-                add_session["beamlineName"] = door_sessions[session]["beamlineName"]
+                add_session["beamLineName"] = door_sessions[session]["beamlineName"]
                 add_session["scheduled"] = door_sessions[session]["scheduled"]
                 add_session["nbShifts"] = door_sessions[session]["nbShifts"]
 
