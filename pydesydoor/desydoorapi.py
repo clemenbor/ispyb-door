@@ -99,11 +99,20 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
-    def get_proposal_sessions(self, proposal_id):
+    def get_proposal_sessions(self, proposal_id, beamline):
+        '''
+            Commisioning proposals contains sessions from different beamlines
+            Here we filter by beamline to make sure we get sessions from a specific beamline
+        '''
         r = self.get_door_request("/experiments/propid/{}".format(proposal_id))
         if r.status_code == 200:
             try:
-                return r.json()['experiment metadata']
+                sessions = []
+                proposal_sessions = r.json()['experiment metadata']
+                for session in proposal_sessions:
+                    if proposal_sessions[session]["beamlineName"] == beamline.upper():
+                        sessions.append(proposal_sessions[session])
+                return sessions
             except KeyError:
                 logging.warning(r.json()['message'])
         return None
