@@ -79,6 +79,10 @@ class DoorPyISPyB(DesyDoorAPI):
                     # There is only one co-writer
                     cowriter = self.get_user_to_pyispyb(door_proposal["proposalCowriters"])
                     persons.append(cowriter)
+        if not persons:
+            # For commisioning proposal there are no persons. py-ispyb required at least one
+            default_person = self.get_user_to_pyispyb("5714")
+            persons.append(default_person)
         # Add proposal persons
         data["persons"] = persons
         # Add lab contacts
