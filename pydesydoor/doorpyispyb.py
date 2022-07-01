@@ -8,8 +8,9 @@ class DoorPyISPyB(DesyDoorAPI):
     RESTful Web-service API client to generate the data format required to import
     data into py-ISPyB.
     """
+
     def get_full_proposal_to_pyispyb(self, door_proposal_id, with_leader=True, with_cowriters=True, with_sessions=True,
-                                     with_session_participants=True):
+                                     with_session_participants=True, start_date=None, end_date=None):
         """
            Get the full proposal data (sessions, etc) from DOOR in format for py-ispyb
 
@@ -18,13 +19,16 @@ class DoorPyISPyB(DesyDoorAPI):
            :param boolean with_cowriters: True/False depending if the proposal cowriters data is needed
            :param boolean with_sessions: True/False depending if the proposal sessions data is needed
            :param boolean with_session_participants: True/False depending if the session participants data is needed
+           :param string start_date (%Y-%m-%d): the start date range to find proposal sessions
+           :param string end_date (%Y-%m-%d): the end date range to find proposal sessions
         """
         ispyb_proposal = {}
         # Getting the proposal data without leader and cowriters
         proposal_data = self.get_proposal_to_pyispyb(door_proposal_id, with_leader, with_cowriters)
         ispyb_proposal["proposal"] = proposal_data
         if with_sessions:
-            sessions_data = self.get_sessions_to_pyispyb(door_proposal_id, with_session_participants)
+            sessions_data = self.get_sessions_to_pyispyb(door_proposal_id, "P11", with_session_participants, start_date,
+                                                         end_date)
             ispyb_proposal["sessions"] = sessions_data
         return json.dumps(ispyb_proposal, indent=4, sort_keys=True, default=str)
 
@@ -108,44 +112,45 @@ class DoorPyISPyB(DesyDoorAPI):
         door_laboratory = self.get_institute(laboratory_id)
         return door_laboratory
 
-    def get_sessions_to_pyispyb(self, door_proposal_id, with_persons=True):
+    def get_sessions_to_pyispyb(self, door_proposal_id, beamline, with_persons=True, start_date=None, end_date=None):
         """
            Get the proposal sessions data from DOOR in format for py-ispyb
 
            :param str door_proposal_id: The DOOR proposal id
+           :param str beamline: The beamline name (to filter sessions from commisioning proposals)
            :param boolean with_persons: True/False depending if the session participants data is needed
         """
         sessions = []
-        door_sessions = self.get_proposal_sessions(door_proposal_id)
+        door_sessions = self.get_proposal_sessions(door_proposal_id, beamline, start_date, end_date)
         if door_sessions:
-            add_session = dict()
             for session in door_sessions:
+                add_session = dict()
                 '''
                 ExternalId field is not compatible with the JAVA API, can be used later
                 when full migration to py-ispyb is done and JAVA API is not used anymore.
                 '''
-                #add_session["externalId"] = int(session)
-                add_session["expSessionPk"] = int(session)
-                datetime_start = datetime.strptime(door_sessions[session]["startDate"], '%Y-%m-%d %H:%M:%S')
+                # add_session["externalId"] = int(session["expSessionPk"])
+                add_session["expSessionPk"] = int(session["expSessionPk"])
+                datetime_start = datetime.strptime(session["startDate"], '%Y-%m-%d %H:%M:%S')
                 add_session["startDate"] = datetime_start.isoformat()
-                datetime_end = datetime.strptime(door_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S')
+                datetime_end = datetime.strptime(session["endDate"], '%Y-%m-%d %H:%M:%S')
                 add_session["endDate"] = datetime_end.isoformat()
-                add_session["beamLineName"] = door_sessions[session]["beamlineName"]
-                add_session["scheduled"] = door_sessions[session]["scheduled"]
-                add_session["nbShifts"] = door_sessions[session]["nbShifts"]
+                add_session["beamLineName"] = session["beamlineName"]
+                add_session["scheduled"] = session["scheduled"]
+                add_session["nbShifts"] = session["nbShifts"]
 
-                if door_sessions[session]["beamlineOperator"]:
-                    operator = self.get_user_to_pyispyb(door_sessions[session]["beamlineOperator"], False)
+                if session["beamlineOperator"]:
+                    operator = self.get_user_to_pyispyb(session["beamlineOperator"], False)
                     add_session["beamlineOperator"] = " ".join([operator["givenName"], operator["familyName"]])
                 if with_persons:
                     persons = []
-                    remotes = self.get_participants(door_sessions[session]["participants"], "remote")
+                    remotes = self.get_participants(session["participants"], "remote")
                     if remotes:
                         persons += remotes
-                    on_sites = self.get_participants(door_sessions[session]["participants"], "on-site")
+                    on_sites = self.get_participants(session["participants"], "on-site")
                     if on_sites:
                         persons += on_sites
-                    data_onlys = self.get_participants(door_sessions[session]["participants"], "data-only")
+                    data_onlys = self.get_participants(session["participants"], "data-only")
                     if data_onlys:
                         persons += data_onlys
                     # Add session participants
