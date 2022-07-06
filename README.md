@@ -37,3 +37,8 @@ There is a command line tool to get a proposal from DOOR and sync it into py-isp
 ```bash
 python syncdoor.py --proposal 20210046
 ```
+
+To sync a commisioning proposal it is mandatory to use a date range. Ex:
+```bash
+python syncdoor.py --proposal_id 20010001 -s 2022-07-01 -e 2022-08-01
+```

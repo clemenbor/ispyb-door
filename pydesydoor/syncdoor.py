@@ -1,27 +1,44 @@
 import os
 import sys
 import time
+from datetime import datetime
 from argparse import ArgumentParser
 from requests import post
 from pydesydoor.doorpyispyb import DoorPyISPyB
 from dotenv import load_dotenv
 
-parser = ArgumentParser()
-parser.add_argument("-p", "--proposal", dest="proposal_id",
-                    help="Door Proposal ID. Ex: 20210002")
+
+def create_arg_parser():
+    # Creates and returns the ArgumentParser object
+    parser = ArgumentParser(
+        description="Command line tool to syncronize a DOOR proposal"
+        "into an ISPyB."
+    )
+    parser.add_argument("-p", "--proposal_id", help="Door proposal ID.", required=True)
+    parser.add_argument("-s", "--start", help="Session start date in format YYYY-MM-DD", required=False)
+    parser.add_argument("-e", "--end", help="Session end date in format YYYY-MM-DD", required=False)
+    parser.add_argument("-d", "--door", help="It will only get and show the proposal from DOOR",
+                        required=False, action="store_true")
+    return parser
 
 
-def sync_proposal(proposal_id):
+def sync_proposal(proposal_id, door=False, start_date=None, end_date=None):
     client = DoorPyISPyB()
-
     try:
-        start = time.time()
-        proposal = client.get_full_proposal_to_pyispyb(proposal_id, True, True, True, True)
-        took = round(time.time() - start, 3)
+        start_time = time.time()
+        proposal = client.get_full_proposal_to_pyispyb(proposal_id, True, True, True, True, start_date, end_date)
+        if door:
+            '''
+            If --door option is passed only get the proposal from DOOR
+            and exit (do not sync with py-ispyb)
+            '''
+            print(proposal)
+            exit(1)
+        took = round(time.time() - start_time, 3)
         print(f"Retrieving proposal {proposal_id} from the DOOR API took {took}")
     except Exception as e:
         print(f"There was an error retrieving proposal {proposal_id} from the DOOR API.")
-        print(f"Probably the proposal Id does not exist within the DOOR API environment.")
+        print("Probably the proposal Id does not exist within the DOOR API environment.")
         print(e)
         sys.exit(1)
 
@@ -56,17 +73,25 @@ def sync_proposal(proposal_id):
             sys.exit(1)
 
 
-def main(args):
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
-
-    args = vars(parser.parse_args())
-
-    if args["proposal_id"]:
-        sync_proposal(args["proposal_id"])
-
-
 if __name__ == "__main__":
-    args = parser.parse_args()
-    main(args)
+    arg_parser = create_arg_parser()
+    parsed_args = arg_parser.parse_args(sys.argv[1:])
+    if parsed_args.proposal_id:
+        if parsed_args.proposal_id == "20010001":
+            '''
+            If it is the commissioning proposal force to sync using a date range
+            Otherwise it will retrieve too many sessions from the past
+            '''
+            if parsed_args.start and parsed_args.end:
+                try:
+                    datetime_start = datetime.strptime(parsed_args.start, '%Y-%m-%d')
+                    datetime_end = datetime.strptime(parsed_args.end, '%Y-%m-%d')
+                    sync_proposal(parsed_args.proposal_id, parsed_args.door, parsed_args.start, parsed_args.end)
+                except ValueError as e:
+                    print(e)
+                    exit(1)
+            else:
+                print("You must use a date range when syncronizing the commissioning proposal 20010001.")
+                exit(1)
+        else:
+            sync_proposal(parsed_args.proposal_id, parsed_args.door)

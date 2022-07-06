@@ -99,7 +99,7 @@ class DesyDoorAPI(object):
                 logging.warning(r.json()['message'])
         return None
 
-    def get_proposal_sessions(self, proposal_id, beamline, start_date, end_date):
+    def get_proposal_sessions(self, proposal_id, beamline, start_date=None, end_date=None):
         '''
             Commisioning proposals contains sessions from different beamlines. Ex: C-20010001
             Here we filter by beamline to make sure we get sessions from a specific beamline
@@ -110,8 +110,11 @@ class DesyDoorAPI(object):
            :param str end_date (%Y-%m-%d): the end date range to find sessions
         '''
         r = self.get_door_request("/experiments/propid/{}".format(proposal_id))
-        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        date_range = False
+        if (start_date is not None) and (end_date is not None):
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            date_range = True
         if r.status_code == 200:
             try:
                 sessions = []
@@ -120,10 +123,15 @@ class DesyDoorAPI(object):
                     # First filter by beamline name
                     if proposal_sessions[session]["beamlineName"] == beamline.upper():
                         # Second filter by date range
-                        session_start_date = datetime.strptime(proposal_sessions[session]["startDate"], '%Y-%m-%d %H:%M:%S').date()
-                        session_end_date = datetime.strptime(proposal_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S').date()
-                        if (session_start_date >= start_date) and (session_end_date <= end_date):
+                        if date_range:
+                            session_start_date = datetime.strptime(proposal_sessions[session]["startDate"], '%Y-%m-%d %H:%M:%S').date()
+                            session_end_date = datetime.strptime(proposal_sessions[session]["endDate"], '%Y-%m-%d %H:%M:%S').date()
+                            if (session_start_date >= start_date) and (session_end_date <= end_date):
+                                sessions.append(proposal_sessions[session])
+                        else:
+                            # If there is no date range just append all the sessions
                             sessions.append(proposal_sessions[session])
+
                 return sessions
             except KeyError:
                 logging.warning(r.json()['message'])
