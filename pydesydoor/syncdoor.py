@@ -77,21 +77,28 @@ if __name__ == "__main__":
     arg_parser = create_arg_parser()
     parsed_args = arg_parser.parse_args(sys.argv[1:])
     if parsed_args.proposal_id:
+        date_range = False
+        if parsed_args.start and parsed_args.end:
+            try:
+                datetime_start = datetime.strptime(parsed_args.start, '%Y-%m-%d')
+                datetime_end = datetime.strptime(parsed_args.end, '%Y-%m-%d')
+                date_range = True
+            except ValueError as e:
+                print(e)
+                exit(1)
+
         if parsed_args.proposal_id == "20010001":
             '''
             If it is the commissioning proposal force to sync using a date range
             Otherwise it will retrieve too many sessions from the past
             '''
-            if parsed_args.start and parsed_args.end:
-                try:
-                    datetime_start = datetime.strptime(parsed_args.start, '%Y-%m-%d')
-                    datetime_end = datetime.strptime(parsed_args.end, '%Y-%m-%d')
-                    sync_proposal(parsed_args.proposal_id, parsed_args.door, parsed_args.start, parsed_args.end)
-                except ValueError as e:
-                    print(e)
-                    exit(1)
+            if date_range:
+                sync_proposal(parsed_args.proposal_id, parsed_args.door, parsed_args.start, parsed_args.end)
             else:
                 print("You must use a date range when syncronizing the commissioning proposal 20010001.")
                 exit(1)
         else:
-            sync_proposal(parsed_args.proposal_id, parsed_args.door)
+            if date_range:
+                sync_proposal(parsed_args.proposal_id, parsed_args.door, parsed_args.start, parsed_args.end)
+            else:
+                sync_proposal(parsed_args.proposal_id, parsed_args.door)
